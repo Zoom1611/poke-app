@@ -18,6 +18,14 @@ npm run serve
 npm run build
 ```
 
-### Customize configuration
+### URL of web page
 
-See [Configuration Reference](https://cli.vuejs.org/config/).
+```
+https://zoom-pokeapp.netlify.app/
+```
+
+### Description
+
+PokeApp is application which works with pokemon API https://pokeapi.co/. In select bar you can find all Pokemons, when you click on search button you will see image of selected Pokemon and his abilities. Also, when you click on ability, window will show and you will se what clicked ability does.
+
+Upgrade coming soon. When clicking on image pokemon images will change and it will look like Pokemon is rotateing for 360 degrees.
