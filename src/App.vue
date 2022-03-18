@@ -27,7 +27,12 @@
     </div>
 
     <div class="imgSearchResult" v-if="showData">
-      <img :src="imgURL" :alt="imgAltName" class="avatarImage" />
+      <img
+        :src="currentUrl"
+        :alt="imgAltName"
+        class="avatarImage"
+        @click="nextUrl"
+      />
       <div
         v-for="(data, index) in abilitiesArr"
         :key="index"
@@ -69,13 +74,16 @@ export default {
     };
 
     let imgURL = ref("");
+    let imgURLs = reactive([]);
     let imgAltName = ref("");
+    let currentUrl = ref(0);
     let showData = ref(false);
     let selectedPokemon = ref("");
     let abilitiesArr = reactive([]);
 
     const getPokemonInfo = async (selectedPokemon) => {
       abilitiesArr.length = 0;
+      imgURLs.length = 0;
       if (selectedPokemon === "") {
         return;
       }
@@ -83,6 +91,16 @@ export default {
         .get(`https://pokeapi.co/api/v2/pokemon/${selectedPokemon}/`)
         .then((response) => {
           console.log(response);
+          for (let key in response.data.sprites) {
+            if (
+              response.data.sprites[key] &&
+              key !== "other" &&
+              key !== "versions"
+            ) {
+              imgURLs.push(response.data.sprites[key]);
+            }
+          }
+
           imgURL.value = response.data.sprites.front_default;
           imgAltName.value =
             response.data.name.charAt(0).toUpperCase() +
@@ -100,6 +118,28 @@ export default {
           console.log(error);
         });
       showData.value = true;
+      if (imgURLs.length > 2) {
+        currentUrl.value = imgURLs[2];
+        arrayMove();
+      } else {
+        currentUrl.value = imgURLs[0];
+      }
+    };
+
+    const arrayMove = function () {
+      let element = imgURLs[2];
+      imgURLs.splice(2, 1);
+      imgURLs.splice(0, 0, element);
+      console.log(imgURLs);
+    };
+
+    const nextUrl = () => {
+      let currentIndex = imgURLs.findIndex((url) => url === currentUrl.value);
+      currentIndex = currentIndex + 1;
+      if (imgURLs.length <= currentIndex) {
+        currentIndex = 0;
+      }
+      currentUrl.value = imgURLs[currentIndex];
     };
 
     let effectOfAbility = ref("");
@@ -126,6 +166,7 @@ export default {
     const dataReload = () => {
       showData.value = false;
       showEffect.value = false;
+      imgURLs.length = 0;
     };
 
     onMounted(() => {
@@ -146,6 +187,8 @@ export default {
       selectedAbility,
       showEffect,
       closeAbilityInfo,
+      currentUrl,
+      nextUrl,
     };
   },
 };
@@ -180,6 +223,7 @@ export default {
   border: 1px solid #909399;
   border-radius: 50%;
   margin-bottom: 30px;
+  cursor: pointer;
 }
 .abilitiesBox {
   font-size: 0.7rem;
